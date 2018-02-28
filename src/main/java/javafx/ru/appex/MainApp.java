@@ -2,7 +2,6 @@ package javafx.ru.appex;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.ru.appex.controller.MainController;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -34,9 +33,9 @@ public class MainApp extends Application {
 //        stage.setTitle("Hello JavaFX and Maven");
 //        stage.setScene(scene);
 
-        Parent root = FXMLLoader.load(getClass().getResource("/views/main2.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/views/main.fxml"));
        // primaryStage.setTitle("Users List");
-        primaryStage.setTitle("Notes List");
+        primaryStage.setTitle("List notes");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
