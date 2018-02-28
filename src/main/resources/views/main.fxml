@@ -17,17 +17,17 @@
   <children>
     <HBox maxHeight="50.0" prefHeight="100.0">
       <children>
-        <Button fx:id="btnAdd" mnemonicParsing="false" onAction="#showDialog" text="Добавить">
+        <Button fx:id="btnAdd" mnemonicParsing="false" onAction="#actionButtonPressed" text="Добавить">
           <HBox.margin>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
           </HBox.margin>
         </Button>
-        <Button fx:id="btnEdit" mnemonicParsing="false" onAction="#showDialog" text="Изменить">
+        <Button fx:id="btnEdit" mnemonicParsing="false" onAction="#actionButtonPressed" text="Изменить">
           <HBox.margin>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
           </HBox.margin>
         </Button>
-        <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#showDialog" text="Удалить">
+        <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#actionButtonPressed" text="Удалить">
           <HBox.margin>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
           </HBox.margin>
@@ -42,7 +42,7 @@
           </columnResizePolicy>
           <columns>
             <TableColumn minWidth="100.0" text="№" visible="false" fx:id="columnId" />
-            <TableColumn minWidth="120.0" prefWidth="-1.0" text="Дата" fx:id="columnDateTime" />
+            <TableColumn minWidth="120.0" prefWidth="-1.0" text="Дата" fx:id="columnDate"/>
             <TableColumn editable="false" minWidth="100.0" prefWidth="-1.0" text="Текст" fx:id="columnText" />
           </columns>
         </TableView>

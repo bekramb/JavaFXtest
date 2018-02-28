@@ -1,8 +1,6 @@
 package javafx.ru.appex.controller;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,8 +16,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MainController {
@@ -33,13 +33,18 @@ public class MainController {
     private TableColumn<Note, Integer> columnId;
 
     @FXML
-    private TableColumn<Note, LocalDateTime> columnDateTime;
+    private TableColumn<Note, LocalDate> columnDate;
 
     @FXML
     private TableColumn<Note, String> columnText;
 
     @FXML
     private Label labelCount;
+
+    private Parent fxmlEdit;
+    private FXMLLoader fxmlLoader = new FXMLLoader();
+    private EditController editController;
+    private Stage editStage;
 
     // инициализируем форму данными
     @FXML
@@ -48,7 +53,7 @@ public class MainController {
 
         // устанавливаем тип и значение которое должно хранится в колонке
         columnId.setCellValueFactory(new PropertyValueFactory<Note, Integer>("id"));
-        columnDateTime.setCellValueFactory(new PropertyValueFactory<Note, LocalDateTime>("dateTime"));
+        columnDate.setCellValueFactory(new PropertyValueFactory<Note, LocalDate>("localDate"));
         columnText.setCellValueFactory(new PropertyValueFactory<Note, String>("text"));
 
         noteDao.getNoteList().addListener(new ListChangeListener<Note>() {
@@ -64,6 +69,16 @@ public class MainController {
 
         // заполняем таблицу данными
         tableNotes.setItems(noteDao.getNoteList());
+
+        try {
+
+            fxmlLoader.setLocation(getClass().getResource("/views/edit.fxml"));
+            fxmlEdit = fxmlLoader.load();
+            editController = fxmlLoader.getController();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -71,7 +86,8 @@ public class MainController {
         labelCount.setText("Количество записей: " + noteDao.getNoteList().size());
     }
 
-    public void showDialog(ActionEvent actionEvent) {
+    public void actionButtonPressed(ActionEvent actionEvent) {
+
         Object source = actionEvent.getSource();
 
         // если нажата не кнопка - выходим из метода
@@ -81,38 +97,44 @@ public class MainController {
 
         Button clickedButton = (Button) source;
 
-        Note selectedNote = (Note)tableNotes.getSelectionModel().getSelectedItem();
+        Note selectedNote =  tableNotes.getSelectionModel().getSelectedItem();
 
-        switch (clickedButton.getId()){
+        Window parentWindow = ((Node) actionEvent.getSource()).getScene().getWindow();
+
+        editController.setNote(selectedNote);
+        editController.setCurrentLocalDate();
+
+        switch (clickedButton.getId()) {
             case "btnAdd":
-                System.out.println("add "+selectedNote);
+
                 break;
 
             case "btnEdit":
-                System.out.println("edit " + selectedNote);
+                showDialog(parentWindow);
                 break;
 
 
             case "btnDelete":
-                System.out.println("delete " + selectedNote);
+               // NoteDaoImpl.delete((Note)tableNotes.getSelectionModel().getSelectedItem());
                 break;
+
         }
 
-        try {
+    }
 
-            Stage stage = new Stage();
-            Parent root = FXMLLoader.load(getClass().getResource("/views/edit.fxml"));
-            stage.setTitle("Редактирование записи");
-            stage.setMinHeight(150);
-            stage.setMinWidth(300);
-            stage.setResizable(false);
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(((Node)actionEvent.getSource()).getScene().getWindow());
-            stage.show();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void showDialog(Window parentWindow) {
+        if (editStage==null) {
+            editStage = new Stage();
+            editStage.setTitle("Редактирование записи");
+            editStage.setMinHeight(150);
+            editStage.setMinWidth(300);
+            editStage.setResizable(false);
+            editStage.setScene(new Scene(fxmlEdit));
+            editStage.initModality(Modality.WINDOW_MODAL);
+            editStage.initOwner(parentWindow);
         }
+            editStage.show();
+
     }
 }

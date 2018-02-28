@@ -4,7 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.ru.appex.model.Note;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class NoteDaoImpl implements NoteDao {
     private ObservableList<Note> noteList = FXCollections.observableArrayList();
@@ -35,14 +35,14 @@ public class NoteDaoImpl implements NoteDao {
         System.out.println();
         for(Note n : noteList){
             number++;
-            System.out.println(number+") data = "+n.getDateTime()+"; text = "+n.getText());
+            System.out.println(number+") data = "+n.getLocalDate()+"; text = "+n.getText());
         }
     }
 
     public void fillTestData(){
         // notes.add(new Note(1, (LocalDateTime.now()).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")), "qwerty"));
-        noteList.add(new Note(2, LocalDateTime.now(), "dsfsdfw"));
-        noteList.add(new Note(3, LocalDateTime.now(), "Jeck@mail.com"));
+        noteList.add(new Note(2, LocalDate.MIN, "dsfsdfw"));
+        noteList.add(new Note(3, LocalDate.MAX, "Jeck@mail.com"));
     }
 
 
