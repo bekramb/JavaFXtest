@@ -3,12 +3,11 @@ package javafx.ru.appex.model;
 import javafx.beans.property.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class Note {
-    private IntegerProperty id;
-    private SimpleObjectProperty<LocalDate> localDate;
-    private StringProperty text;
+    private SimpleIntegerProperty id = new SimpleIntegerProperty(0);
+    private SimpleObjectProperty<LocalDate> localDate = new SimpleObjectProperty<>(LocalDate.now());
+    private SimpleStringProperty text = new SimpleStringProperty("");
 
     public Note() {
     }
@@ -41,6 +40,18 @@ public class Note {
 
     public void setText(String text) {
         this.text.set(text);
+    }
+
+    public SimpleIntegerProperty idProperty(){
+        return id;
+    }
+
+    public SimpleObjectProperty<LocalDate> localDateProperty(){
+        return localDate;
+    }
+
+    public SimpleStringProperty textProperty(){
+        return text;
     }
 
     @Override

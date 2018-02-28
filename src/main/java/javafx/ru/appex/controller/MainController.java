@@ -2,11 +2,11 @@ package javafx.ru.appex.controller;
 
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.ru.appex.dao.NoteDaoImpl;
 import javafx.ru.appex.model.Note;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -14,17 +14,32 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
+// TODO: 01.03.2018 Разобраться с нуль пойнтером при инициализации note
+// TODO: 01.03.2018 Разобраться с размерами в таблице и с отображением даты
+// TODO: 01.03.2018 Прикрутить работу с базой данных
+// TODO: 01.03.2018 Реализовать работу с бд в потоке
 public class MainController {
 
     private NoteDaoImpl noteDao = new NoteDaoImpl();
+
+    private Stage mainStage;
+
+    @FXML
+    private Button btnAdd;
+
+    @FXML
+    private Button btnEdit;
+
+    @FXML
+    private Button btnDelete;
+
 
     @FXML
     private TableView<Note> tableNotes;
@@ -46,16 +61,28 @@ public class MainController {
     private EditController editController;
     private Stage editStage;
 
+    public void setMainStage(Stage mainStage) {
+        this.mainStage = mainStage;
+    }
+
     // инициализируем форму данными
     @FXML
     private void initialize() {
 
-
-        // устанавливаем тип и значение которое должно хранится в колонке
         columnId.setCellValueFactory(new PropertyValueFactory<Note, Integer>("id"));
         columnDate.setCellValueFactory(new PropertyValueFactory<Note, LocalDate>("localDate"));
         columnText.setCellValueFactory(new PropertyValueFactory<Note, String>("text"));
+        initListeners();
+        fillData();
+        initLoader();
+    }
 
+    private void fillData() {
+        noteDao.fillTestData();
+        tableNotes.setItems(noteDao.getNoteList());
+    }
+
+    private void initListeners(){
         noteDao.getNoteList().addListener(new ListChangeListener<Note>() {
             @Override
             public void onChanged(Change<? extends Note> c) {
@@ -63,13 +90,18 @@ public class MainController {
             }
         });
 
-        // подготавливаем данные для таблицы
-        // вы можете получать их с базы данных
-        noteDao.fillTestData();
+        tableNotes.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getClickCount() == 2) {
+                    editController.setNote((Note)tableNotes.getSelectionModel().getSelectedItem());
+                    showDialog();
+                }
+            }
+        });
+    }
 
-        // заполняем таблицу данными
-        tableNotes.setItems(noteDao.getNoteList());
-
+    private void initLoader() {
         try {
 
             fxmlLoader.setLocation(getClass().getResource("/views/edit.fxml"));
@@ -97,25 +129,21 @@ public class MainController {
 
         Button clickedButton = (Button) source;
 
-        Note selectedNote =  tableNotes.getSelectionModel().getSelectedItem();
-
-        Window parentWindow = ((Node) actionEvent.getSource()).getScene().getWindow();
-
-        editController.setNote(selectedNote);
-        editController.setCurrentLocalDate();
-
         switch (clickedButton.getId()) {
             case "btnAdd":
-
+                editController.setNote(new Note());
+                editController.setCurrentLocalDate();
+                showDialog();
+                noteDao.add(editController.getNote());
                 break;
 
             case "btnEdit":
-                showDialog(parentWindow);
+                editController.setNote((Note)tableNotes.getSelectionModel().getSelectedItem());
+                showDialog();
                 break;
 
-
             case "btnDelete":
-               // NoteDaoImpl.delete((Note)tableNotes.getSelectionModel().getSelectedItem());
+                noteDao.delete((Note)tableNotes.getSelectionModel().getSelectedItem());
                 break;
 
         }
@@ -123,7 +151,7 @@ public class MainController {
     }
 
 
-    private void showDialog(Window parentWindow) {
+    private void showDialog() {
         if (editStage==null) {
             editStage = new Stage();
             editStage.setTitle("Редактирование записи");
@@ -132,9 +160,9 @@ public class MainController {
             editStage.setResizable(false);
             editStage.setScene(new Scene(fxmlEdit));
             editStage.initModality(Modality.WINDOW_MODAL);
-            editStage.initOwner(parentWindow);
+            editStage.initOwner(mainStage);
         }
-            editStage.show();
+            editStage.showAndWait();
 
     }
 }

@@ -28,6 +28,21 @@ public class EditController {
 
     private Note note;
 
+    public Note getNote() {
+        return note;
+    }
+
+    public void setNote(Note note) {
+        if(note == null){
+            return;
+        }
+        this.note = note;
+        localDate.setValue(note.getLocalDate());
+        textNote.setText(note.getText());
+    }
+
+
+
 
     public void actionClose(ActionEvent actionEvent) {
         Node source = (Node) actionEvent.getSource();
@@ -51,15 +66,10 @@ public class EditController {
     }
 
 
-
-    public void setNote(Note note) {
-        this.note = note;
-
-        localDate.setValue(note.getLocalDate());
-        textNote.setText(note.getText());
-    }
-
     public void setCurrentLocalDate() {
+        if (localDate == null){
+            localDate = new DatePicker();
+        }
         this.localDate.setValue(LocalDate.now());
     }
 }

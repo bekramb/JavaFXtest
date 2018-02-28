@@ -34,16 +34,16 @@
         </Button>
       </children>
     </HBox>
-    <AnchorPane prefHeight="120.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+    <AnchorPane prefHeight="120.0" prefWidth="350.0" VBox.vgrow="ALWAYS">
       <children>
-        <TableView fx:id="tableNotes" prefHeight="180.0" prefWidth="291.0" AnchorPane.bottomAnchor="-40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-20.0">
+        <TableView fx:id="tableNotes" prefHeight="180.0" prefWidth="350.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="-40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-20.0">
           <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
           </columnResizePolicy>
           <columns>
-            <TableColumn minWidth="100.0" text="№" visible="false" fx:id="columnId" />
-            <TableColumn minWidth="120.0" prefWidth="-1.0" text="Дата" fx:id="columnDate"/>
-            <TableColumn editable="false" minWidth="100.0" prefWidth="-1.0" text="Текст" fx:id="columnText" />
+            <TableColumn editable="false" minWidth="100.0" text="№" visible="false" fx:id="columnId" />
+            <TableColumn editable="false" minWidth="120.0" prefWidth="50.0" text="Дата" fx:id="columnDate" />
+            <TableColumn editable="false" minWidth="100.0" prefWidth="200.0" resizable="true" text="Текст" fx:id="columnText" />
           </columns>
         </TableView>
       </children>
