@@ -1,15 +1,19 @@
 package javafx.ru.appex.dao;
 
+import javafx.collections.ObservableList;
 import javafx.ru.appex.model.Note;
 
 public interface NoteDao {
 
     // добавить запись
-    void add(Note note);
+    boolean add(Note note);
 
     // внести измененные значения (подтвердить измененные данные)
-    void update(Note note);
+    boolean update(Note note);
 
     // удалить запись
-    void delete(Note note);
+    boolean delete(Note note);
+
+    // Получить все записи
+    ObservableList<Note> findAll();
 }

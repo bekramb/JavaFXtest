@@ -1,12 +1,17 @@
 package javafx.ru.appex.controller;
 
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.ru.appex.dao.NoteDaoImpl;
+import javafx.ru.appex.dao.DBNoteDaoImpl;
+import javafx.ru.appex.dao.NoteDao;
 import javafx.ru.appex.model.Note;
+import javafx.ru.appex.utils.DialogManager;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -19,17 +24,20 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
-// TODO: 01.03.2018 Разобраться с нуль пойнтером при инициализации note
-// TODO: 01.03.2018 Разобраться с размерами в таблице и с отображением даты
-// TODO: 01.03.2018 Прикрутить работу с базой данных
-// TODO: 01.03.2018 Реализовать работу с бд в потоке
-public class MainController {
 
-    private NoteDaoImpl noteDao = new NoteDaoImpl();
+public class MainController  {
+
+    private NoteDao noteDao = new DBNoteDaoImpl();
 
     private Stage mainStage;
+
+    private ExecutorService service;
 
     @FXML
     private Button btnAdd;
@@ -69,21 +77,52 @@ public class MainController {
     @FXML
     private void initialize() {
 
+        //For multithreading: Create executor that uses daemon threads:
+        service = Executors.newCachedThreadPool(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable runnable) {
+                Thread t = new Thread(runnable);
+                t.setDaemon(true);
+                return t;
+            }
+        });
+
         columnId.setCellValueFactory(new PropertyValueFactory<Note, Integer>("id"));
         columnDate.setCellValueFactory(new PropertyValueFactory<Note, LocalDate>("localDate"));
         columnText.setCellValueFactory(new PropertyValueFactory<Note, String>("text"));
         initListeners();
-        fillData();
+        try {
+            fillTable();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            DialogManager.showErrorDialog("Ошибка обновления данных из бд"," Не удалось обновить данные");
+        } catch (ClassNotFoundException e) {
+            DialogManager.showErrorDialog("Ошибка обновления данных из бд"," Не удалось обновить данные");
+        }
         initLoader();
     }
 
-    private void fillData() {
-        noteDao.fillTestData();
-        tableNotes.setItems(noteDao.getNoteList());
+    private void fillTable() throws SQLException, ClassNotFoundException {
+        Task<ObservableList<Note>> task = new Task<ObservableList<Note>>(){
+            @Override
+            public ObservableList<Note> call() throws Exception{
+                ObservableList<Note> result = noteDao.findAll();
+                return result;
+            }
+        };
+
+        task.setOnFailed(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent e) {
+                task.getException().printStackTrace();
+            }
+        });
+        task.setOnSucceeded(e-> tableNotes.setItems((ObservableList<Note>) task.getValue()));
+        service.submit(task);
     }
 
     private void initListeners(){
-        noteDao.getNoteList().addListener(new ListChangeListener<Note>() {
+        ((DBNoteDaoImpl)noteDao).getNoteList().addListener(new ListChangeListener<Note>() {
             @Override
             public void onChanged(Change<? extends Note> c) {
                 updateCountLabel();
@@ -115,7 +154,7 @@ public class MainController {
 
 
     private void updateCountLabel() {
-        labelCount.setText("Количество записей: " + noteDao.getNoteList().size());
+        labelCount.setText("Количество записей: " + ((DBNoteDaoImpl)noteDao).getNoteList().size());
     }
 
     public void actionButtonPressed(ActionEvent actionEvent) {
@@ -134,7 +173,15 @@ public class MainController {
                 editController.setNote(new Note());
                 editController.setCurrentLocalDate();
                 showDialog();
-                noteDao.add(editController.getNote());
+                Task<Boolean> taskAdd = new Task<Boolean>(){
+                    @Override
+                    public Boolean call() throws Exception{
+                       boolean b = noteDao.add(editController.getNote());
+                        return b;
+                    }
+                };
+               // noteDao.add(editController.getNote());
+                service.submit(taskAdd);
                 break;
 
             case "btnEdit":
@@ -143,7 +190,14 @@ public class MainController {
                 break;
 
             case "btnDelete":
-                noteDao.delete((Note)tableNotes.getSelectionModel().getSelectedItem());
+                Task<Boolean> taskRemove = new Task<Boolean>(){
+                    @Override
+                    public Boolean call() throws Exception{
+                        boolean b =  noteDao.delete((Note)tableNotes.getSelectionModel().getSelectedItem());;
+                        return b;
+                    }
+                };
+                service.submit(taskRemove);
                 break;
 
         }
