@@ -23,7 +23,6 @@ public class DialogManager {
         alert.showAndWait();
     }
 
-
     public static Optional<ButtonType> showConfirmDialog(String title, String text){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(title);
@@ -32,10 +31,5 @@ public class DialogManager {
         alert.setHeaderText(null);
         Optional<ButtonType> result = alert.showAndWait();
         return result;
-
     }
-
-
-
-
 }

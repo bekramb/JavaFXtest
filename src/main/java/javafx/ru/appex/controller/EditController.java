@@ -33,6 +33,8 @@ public class EditController {
 
     private Note note;
 
+    private boolean saveClicked = false;// для определения нажатой кнопки
+
     public Note getNote() {
         return note;
     }
@@ -41,6 +43,7 @@ public class EditController {
         if (note == null) {
             return;
         }
+        saveClicked = false;
         this.note = note;
         localDate.setValue(note.getLocalDate());
         textNote.setText(note.getText());
@@ -58,6 +61,7 @@ public class EditController {
         }
         note.setLocalDate(localDate.getValue());
         note.setText(textNote.getText());
+        saveClicked = true;
         actionClose(actionEvent);
     }
 
@@ -78,11 +82,14 @@ public class EditController {
         return true;
     }
 
-
     public void setCurrentLocalDate() {
         if (localDate == null) {
             localDate = new DatePicker();
         }
         this.localDate.setValue(LocalDate.now());
+    }
+
+    public boolean isSaveClicked() {
+        return saveClicked;
     }
 }

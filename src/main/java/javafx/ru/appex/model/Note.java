@@ -42,15 +42,15 @@ public class Note {
         this.text.set(text);
     }
 
-    public SimpleIntegerProperty idProperty(){
+    public SimpleIntegerProperty idProperty() {
         return id;
     }
 
-    public SimpleObjectProperty<LocalDate> localDateProperty(){
+    public SimpleObjectProperty<LocalDate> localDateProperty() {
         return localDate;
     }
 
-    public SimpleStringProperty textProperty(){
+    public SimpleStringProperty textProperty() {
         return text;
     }
 
