@@ -25,7 +25,6 @@ public class DBNoteDaoImpl implements NoteDao {
             if (result > 0) {
                 int id = statement.getGeneratedKeys().getInt(1);// получить сгенерированный id вставленной записи
                 note.setId(id);
-                // noteList.add(note);
                 return true;
             }
         } catch (SQLException ex) {
@@ -42,7 +41,6 @@ public class DBNoteDaoImpl implements NoteDao {
             int result = statement.executeUpdate("delete from note where id=" + note.getId());
 
             if (result > 0) {
-                // noteList.remove(note);
                 return true;
             }
 
@@ -79,7 +77,6 @@ public class DBNoteDaoImpl implements NoteDao {
 
             int result = statement.executeUpdate();
             if (result > 0) {
-                // обновление в коллекции происходит автоматически, после нажатия ОК в окне редактирования
                 return true;
             }
         } catch (SQLException ex) {

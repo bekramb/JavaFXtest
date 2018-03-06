@@ -10,13 +10,11 @@ import java.util.logging.Logger;
 
 public class SQLiteConnection {
 
-    public static final String JDBC_SQLITE_DB_BIRTHDAYS_DB = "jdbc:sqlite:db/notes.db";
-    public static final String ORG_SQLITE_JDBC = "org.sqlite.JDBC";
+    public static final String JDBC_SQLITE_NOTE_DB = "jdbc:sqlite:memory";
 
     public static Connection getConnection() {
         try {
-            Class.forName(ORG_SQLITE_JDBC).newInstance();
-            String url = JDBC_SQLITE_DB_BIRTHDAYS_DB;
+            String url = JDBC_SQLITE_NOTE_DB;
             return DriverManager.getConnection(url);
         } catch (Exception ex) {
             Logger.getLogger(DBNoteDaoImpl.class.getName()).log(Level.SEVERE, null, ex);

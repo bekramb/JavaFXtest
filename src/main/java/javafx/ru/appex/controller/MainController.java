@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.ru.appex.dao.DBNoteDaoImpl;
 import javafx.ru.appex.dao.NoteDao;
+import javafx.ru.appex.db.InitDb;
 import javafx.ru.appex.model.Note;
 import javafx.ru.appex.utils.DialogManager;
 import javafx.scene.Parent;
@@ -95,6 +96,8 @@ public class MainController {
         columnText.setCellValueFactory(new PropertyValueFactory<Note, String>("text"));
         initListeners();
         try {
+            InitDb.createDB();
+            InitDb.writeDB();
             fillTable();
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -241,8 +244,8 @@ public class MainController {
                                 e.printStackTrace();
                             }
                             if (result) {
-                                   selectedNote.setLocalDate(editController.getNote().getLocalDate());
-                                   selectedNote.setText(editController.getNote().getText());
+                                selectedNote.setLocalDate(editController.getNote().getLocalDate());
+                                selectedNote.setText(editController.getNote().getText());
                             }
                         }
                     });
